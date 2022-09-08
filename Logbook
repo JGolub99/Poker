@@ -1,0 +1,29 @@
+Wednesday 7th September 2022:
+
+I have coded a Python file that allows for a deck of cards to be built, a number of players to be
+instantiated with names and stacks, and for each player to be dealt a hand from the deck.
+Inspiration from: https://www.youtube.com/watch?v=t8YkjDH86Y4&t=136s
+
+The next step is finding a way to lay down a flop, turn and river while saving the information
+of the current hands and stacks. I will need to revisit my python book to help me with this.
+I will worry about betting on hands later on, and developing an AI is much further down the line.
+
+I might also try to get Griffin involved to help create a UI.
+
+
+
+Thursday 8th September 2022:
+
+I have managed to code a class for the board and member functions to lay down a flop, turn and river.
+I did this using input statements. I now need to create a pot and create player actions.
+
+I have coded player actions for: fold, bet and call. Technically I can use these actions for check
+and raise as well by concurrently betting 0 and an amount that is greater than the current bet.
+I have an idea for using logic statements to enforce rules for when a bet is not met with another raise.
+Also need to add an action for paying blinds.
+
+I have now also made code for a pot class, including the ability to collect player bets and
+to empty the pot. Currently have no way of identifying a winner so will put a pin in transferring
+the money in the pot to the winner of the round.
+
+I have just made an official project directory and online repository, including main and this logbook.
