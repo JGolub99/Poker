@@ -61,6 +61,13 @@ class Player:
     num_players = 0
     call_value = 0
 
+    fold_list = ["fold", "Fold", "FOLD"]
+    call_list = ["call", "Call", "CALL"]
+    bet_list = ["bet", "Bet", "BET"]
+    raise_list = ["raise", "Raise", "RAISE"]
+    check_list = ["check", "Check", "CHECK"]
+    action_list = fold_list+call_list+bet_list+raise_list+check_list 
+
     def __init__(self, name, stack):
         self.hand = []
         self.player_pot = 0
@@ -94,6 +101,33 @@ class Player:
         self.call_value = Player.call_value - self.player_pot
         self.player_pot = self.player_pot + self.call_value
         self.stack = self.stack - self.call_value
+
+# Method to request action from player
+
+    def action(self):
+        x = input("{} action: ".format(self.name))
+        x_list = x.split()
+        if x_list[0] in Player.fold_list:
+            self.fold()
+        if x_list[0] in Player.bet_list:
+            self.bet(int(x_list[1]))
+        if x_list[0] in Player.call_list:
+            self.call()
+        if x_list[0] in Player.raise_list:
+            if int(x_list[1])>Player.call_value:
+               self.bet(int(x_list[1]))
+            else:
+                print("Illegal play ")
+                self.action()
+        if x_list[0] in Player.check_list:
+            if Player.call_value>0:
+                print("Illegal play ")
+                self.action()
+            else:
+                self.bet(0)
+        if x_list[0] not in Player.action_list:
+            print("Illegal play ")
+            self.action()
 
 
 class Board:
@@ -168,5 +202,15 @@ def main():
     board.show_board()
 
 
-if __name__ == '__main__':
-    main()
+# if __name__ == '__main__':
+#    main()
+
+deck = Deck()
+jacob = Player("Jacob", 2000)
+lia = Player("Lia", 1000)
+jacob.draw_card(deck).draw_card(deck)
+lia.draw_card(deck).draw_card(deck)
+jacob.action()
+print(jacob.stack)
+lia.action()
+print(lia.stack)

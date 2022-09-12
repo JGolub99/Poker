@@ -28,3 +28,11 @@ the money in the pot to the winner of the round.
 
 I have just made an official project directory and online repository, including main and this logbook.
 This line is testing that the github repo is working.
+
+
+Monday 12th September 2022:
+
+Temporarily working on Dad's old desktop while my laptop is getting fixed.
+
+I have just made an action method that requests a player do one of:
+check, fold, bet, raise or call. I also coded some logic to ensure that the move is legal, and if not then the action is retaken.
