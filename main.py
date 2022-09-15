@@ -108,7 +108,7 @@ class Player:
     @classmethod
     def reset_folders(cls):
         for i in cls.players:
-            i.foldi == False
+            i.foldi = False
 
 # Action methods
 
@@ -213,7 +213,7 @@ def main():
     sam = Player("Sam", 1000)
     i=0
 
-    while i < 1:
+    while i < 2:
         deck = Deck()
         deck.shuffle()
         Player.reset_players()
