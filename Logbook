@@ -41,3 +41,8 @@ check, fold, bet, raise or call. I also coded some logic to ensure that the move
 Thursday 15th September 2022:
 
 A class method to ask for actions from all the players has been added to assist in running of the methods. This will have to be editted once the dealer button is made and the order of play changes.
+
+Noticed that something weird is going on with folding. Players cannot fold and continue the turn. Fixed, this was due to an error in the code.
+
+Now when a player folds, its skips the turn of who is directly next.
+The problem is that when a player is removed from the player_in_hand list, the for loop skips the next one. Fixed by incorporating a new method that identifies folders.

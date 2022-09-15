@@ -61,6 +61,7 @@ class Player:
     num_players = 0
     call_value = 0
     players = []
+    players_in_hand = []
 
     fold_list = ["fold", "Fold", "FOLD"]
     call_list = ["call", "Call", "CALL"]
@@ -71,6 +72,7 @@ class Player:
 
     def __init__(self, name, stack):
         self.hand = []
+        self.foldi = False
         self.player_pot = 0
         self.name = name
         self.stack = stack
@@ -89,16 +91,30 @@ class Player:
         for c in self.hand:
             c.show()
 
+#Method to reset players_in_hand between folds and games:
+    @classmethod
+    def reset_players(cls):
+        cls.players_in_hand.clear()
+        for i in cls.players:
+            if i.foldi == False:
+               cls.players_in_hand.append(i)
+
 # Method to reset call value between bets:
     @classmethod
     def reset_call(cls):
        cls.call_value=0
 
+# Method to reset fold values to False for all players at table
+    @classmethod
+    def reset_folders(cls):
+        for i in cls.players:
+            i.foldi == False
 
 # Action methods
 
     def fold(self):
         self.hand.clear()
+        self.foldi = True
 
     def bet(self, amount):
         self.player_pot = self.player_pot + amount
@@ -140,8 +156,9 @@ class Player:
 # Method to call upon all players for an action and reset call value:
     @classmethod
     def player_action(cls):
-        for i in cls.players:
+        for i in cls.players_in_hand:
             i.action()
+        cls.reset_players()
         cls.reset_call()
 
 
@@ -193,11 +210,13 @@ def main():
 
     jacob = Player("Jacob", 2000)
     lia = Player("Lia", 1000)
+    sam = Player("Sam", 1000)
     i=0
 
     while i < 1:
         deck = Deck()
         deck.shuffle()
+        Player.reset_players()
         jacob.draw_card(deck).draw_card(deck)
         print(jacob.name, jacob.stack, ":")
         jacob.show_hand()
@@ -206,6 +225,7 @@ def main():
         print(lia.name, lia.stack, ":")
         lia.show_hand()
         print("")
+        sam.draw_card(deck).draw_card(deck)
         Player.player_action()
         input("Draw flop: \n")
         board = Board(deck)
@@ -221,6 +241,7 @@ def main():
         board.draw_river(deck)
         board.show_board()
         Player.player_action()
+        Player.reset_folders()
         i+=1
 
 
