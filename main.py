@@ -60,6 +60,7 @@ class Player:
 
     num_players = 0
     call_value = 0
+    players = []
 
     fold_list = ["fold", "Fold", "FOLD"]
     call_list = ["call", "Call", "CALL"]
@@ -74,6 +75,7 @@ class Player:
         self.name = name
         self.stack = stack
         Player.num_players += 1
+        Player.players.append(self)
 
 # Method to draw card from a given deck, chainable
 
@@ -86,6 +88,12 @@ class Player:
     def show_hand(self):
         for c in self.hand:
             c.show()
+
+# Method to reset call value between bets:
+    @classmethod
+    def reset_call(cls):
+       cls.call_value=0
+
 
 # Action methods
 
@@ -128,6 +136,13 @@ class Player:
         if x_list[0] not in Player.action_list:
             print("Illegal play ")
             self.action()
+        
+# Method to call upon all players for an action and reset call value:
+    @classmethod
+    def player_action(cls):
+        for i in cls.players:
+            i.action()
+        cls.reset_call()
 
 
 class Board:
@@ -175,42 +190,40 @@ class Pot:
 
 
 def main():
-    deck = Deck()
-    deck.shuffle()
 
     jacob = Player("Jacob", 2000)
     lia = Player("Lia", 1000)
-    jacob.draw_card(deck).draw_card(deck)
-    print(jacob.name, jacob.stack, ":")
-    jacob.show_hand()
-    print("")
-    lia.draw_card(deck).draw_card(deck)
-    print(lia.name, lia.stack, ":")
-    lia.show_hand()
-    print("")
+    i=0
 
-    input("Draw flop: \n")
-    board = Board(deck)
-    board.show_board()
-    print("")
-    input("Draw turn: \n")
-    board.draw_turn(deck)
-    board.show_board()
-    print("")
-    input("Draw river: \n")
-    board.draw_river(deck)
-    board.show_board()
+    while i < 1:
+        deck = Deck()
+        deck.shuffle()
+        jacob.draw_card(deck).draw_card(deck)
+        print(jacob.name, jacob.stack, ":")
+        jacob.show_hand()
+        print("")
+        lia.draw_card(deck).draw_card(deck)
+        print(lia.name, lia.stack, ":")
+        lia.show_hand()
+        print("")
+        Player.player_action()
+        input("Draw flop: \n")
+        board = Board(deck)
+        board.show_board()
+        print("")
+        Player.player_action()
+        input("Draw turn: \n")
+        board.draw_turn(deck)
+        board.show_board()
+        print("")
+        Player.player_action()
+        input("Draw river: \n")
+        board.draw_river(deck)
+        board.show_board()
+        Player.player_action()
+        i+=1
 
 
-# if __name__ == '__main__':
-#    main()
 
-deck = Deck()
-jacob = Player("Jacob", 2000)
-lia = Player("Lia", 1000)
-jacob.draw_card(deck).draw_card(deck)
-lia.draw_card(deck).draw_card(deck)
-jacob.action()
-print(jacob.stack)
-lia.action()
-print(lia.stack)
+if __name__ == '__main__':
+    main()

@@ -36,3 +36,8 @@ Temporarily working on Dad's old desktop while my laptop is getting fixed.
 
 I have just made an action method that requests a player do one of:
 check, fold, bet, raise or call. I also coded some logic to ensure that the move is legal, and if not then the action is retaken.
+
+
+Thursday 15th September 2022:
+
+A class method to ask for actions from all the players has been added to assist in running of the methods. This will have to be editted once the dealer button is made and the order of play changes.
