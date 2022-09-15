@@ -110,6 +110,12 @@ class Player:
         for i in cls.players:
             i.foldi = False
 
+# Method to discard all current hands
+    @classmethod
+    def discard_hands(cls):
+        for i in cls.players:
+            i.hand.clear()
+
 # Action methods
 
     def fold(self):
@@ -201,6 +207,7 @@ class Pot:
     def collect_bets(self):
         for i in self.players:
             self.value = self.value + i.player_pot
+            i.player_pot = 0
 
     def empty_pot(self):
         self.value = 0
@@ -212,10 +219,12 @@ def main():
     lia = Player("Lia", 1000)
     sam = Player("Sam", 1000)
     i=0
+    pot = Pot(Player.players)
 
     while i < 2:
         deck = Deck()
         deck.shuffle()
+        pot.empty_pot()
         Player.reset_players()
         jacob.draw_card(deck).draw_card(deck)
         print(jacob.name, jacob.stack, ":")
@@ -227,21 +236,27 @@ def main():
         print("")
         sam.draw_card(deck).draw_card(deck)
         Player.player_action()
+        pot.collect_bets()
         input("Draw flop: \n")
         board = Board(deck)
         board.show_board()
         print("")
         Player.player_action()
+        pot.collect_bets()
         input("Draw turn: \n")
         board.draw_turn(deck)
         board.show_board()
         print("")
         Player.player_action()
+        pot.collect_bets()
         input("Draw river: \n")
         board.draw_river(deck)
         board.show_board()
         Player.player_action()
+        pot.collect_bets()
+        pot.show_value()
         Player.reset_folders()
+        Player.discard_hands()
         i+=1
 
 
