@@ -48,3 +48,8 @@ Now when a player folds, its skips the turn of who is directly next.
 The problem is that when a player is removed from the player_in_hand list, the for loop skips the next one. Fixed by incorporating a new method that identifies folders.
 
 Also added the pot to the chain of command. Creating one big function for this chain of command will be very useful.
+
+
+Friday 16th September 2022:
+
+Adapted the action method to make it recursive under certain if statements. This allows for raises to be met and the play to loop around the table when they haven't been met.

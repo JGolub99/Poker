@@ -161,10 +161,24 @@ class Player:
         
 # Method to call upon all players for an action and reset call value:
     @classmethod
-    def player_action(cls):
-        for i in cls.players_in_hand:
-            i.action()
-        cls.reset_players()
+    def player_action(cls, round1=True):
+        if round1==True:
+            for i in cls.players_in_hand:
+                i.action()
+                print(i.player_pot, cls.call_value)
+            cls.reset_players()
+            for i in cls.players_in_hand:
+                if i.player_pot < cls.call_value:
+                    cls.player_action(False)
+        elif round1==False:
+            for i in cls.players_in_hand:
+                if i.player_pot < cls.call_value:
+                    i.action()
+                    print(i.player_pot, cls.call_value)
+            cls.reset_players()
+            for i in cls.players_in_hand:
+                if i.player_pot < cls.call_value:
+                    cls.player_action(False)
         cls.reset_call()
 
 
@@ -221,7 +235,7 @@ def main():
     i=0
     pot = Pot(Player.players)
 
-    while i < 2:
+    while i < 1:
         deck = Deck()
         deck.shuffle()
         pot.empty_pot()
