@@ -53,3 +53,12 @@ Also added the pot to the chain of command. Creating one big function for this c
 Friday 16th September 2022:
 
 Adapted the action method to make it recursive under certain if statements. This allows for raises to be met and the play to loop around the table when they haven't been met.
+
+After having added an all in option, I've noticed that there is a problem with betting more than the player has. This will needed to be appended in the methods with some logic.
+This has now been fixed. I also changed some of the code so that it is impossible to ever have a negative stack and for the game to skip your turn if you have 0 stack but haven't folded.
+
+One problem is that there is no way of creating a side pot or for a big stack to be refunded when they're called for an all in. This will need to be addressed at some point, possibly with a sidepot child class.
+
+Also still need to create a dealer button to change order of play between games.
+
+For the moment, all of the game mechanics for player actions seems to be working as it should be. This will of course need to be play-tested with a nice UI, but for the moment I shall assume it is bug free. The next challenge is finding a way to determine who has the winning hand. For this I think I will have to do some research.

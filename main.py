@@ -68,7 +68,8 @@ class Player:
     bet_list = ["bet", "Bet", "BET"]
     raise_list = ["raise", "Raise", "RAISE"]
     check_list = ["check", "Check", "CHECK"]
-    action_list = fold_list+call_list+bet_list+raise_list+check_list 
+    allin_list = ["all", "All", "ALL"]
+    action_list = fold_list+call_list+bet_list+raise_list+check_list+allin_list 
 
     def __init__(self, name, stack):
         self.hand = []
@@ -129,57 +130,73 @@ class Player:
 
     def call(self):
         self.call_value = Player.call_value - self.player_pot
-        self.player_pot = self.player_pot + self.call_value
-        self.stack = self.stack - self.call_value
+        if self.call_value <= self.stack:
+            self.player_pot = self.player_pot + self.call_value
+            self.stack = self.stack - self.call_value
+        else:
+            self.player_pot = self.player_pot + self.stack
+            self.stack = 0
 
 # Method to request action from player
 
     def action(self):
-        x = input("{} action: ".format(self.name))
-        x_list = x.split()
-        if x_list[0] in Player.fold_list:
-            self.fold()
-        if x_list[0] in Player.bet_list:
-            self.bet(int(x_list[1]))
-        if x_list[0] in Player.call_list:
-            self.call()
-        if x_list[0] in Player.raise_list:
-            if int(x_list[1])>Player.call_value:
-               self.bet(int(x_list[1]))
-            else:
+        if self.stack!=0:
+            x = input("{} action: ".format(self.name))
+            x_list = x.split()
+            if x_list[0] in Player.fold_list:
+                self.fold()
+            if x_list[0] in Player.bet_list:
+                if int(x_list[1])>self.stack or Player.call_value>0:
+                    print("Illegal play ")
+                    self.action()
+                else:
+                    self.bet(int(x_list[1]))
+            if x_list[0] in Player.allin_list:
+                self.bet(self.stack)
+            if x_list[0] in Player.call_list:
+                if Player.call_value == 0:
+                    print("Illegal play ")
+                    self.action()
+                else:
+                    self.call()
+            if x_list[0] in Player.raise_list:
+                if int(x_list[1])>Player.call_value and int(x_list[1])<=(self.stack+self.player_pot):
+                   self.bet(int(x_list[1]))
+                else:
+                    print("Illegal play ")
+                    self.action()
+            if x_list[0] in Player.check_list:
+                if Player.call_value>0:
+                    print("Illegal play ")
+                    self.action()
+                else:
+                    self.bet(0)
+            if x_list[0] not in Player.action_list:
                 print("Illegal play ")
                 self.action()
-        if x_list[0] in Player.check_list:
-            if Player.call_value>0:
-                print("Illegal play ")
-                self.action()
-            else:
-                self.bet(0)
-        if x_list[0] not in Player.action_list:
-            print("Illegal play ")
-            self.action()
         
 # Method to call upon all players for an action and reset call value:
     @classmethod
     def player_action(cls, round1=True):
-        if round1==True:
-            for i in cls.players_in_hand:
-                i.action()
-                print(i.player_pot, cls.call_value)
-            cls.reset_players()
-            for i in cls.players_in_hand:
-                if i.player_pot < cls.call_value:
-                    cls.player_action(False)
-        elif round1==False:
-            for i in cls.players_in_hand:
-                if i.player_pot < cls.call_value:
+        if len(cls.players_in_hand)>1:
+            if round1==True:
+                for i in cls.players_in_hand:
                     i.action()
-                    print(i.player_pot, cls.call_value)
-            cls.reset_players()
-            for i in cls.players_in_hand:
-                if i.player_pot < cls.call_value:
-                    cls.player_action(False)
-        cls.reset_call()
+                    print(i.player_pot, i.stack)
+                cls.reset_players()
+                for i in cls.players_in_hand:
+                    if i.player_pot < cls.call_value and i.stack !=0:
+                        cls.player_action(False)
+            elif round1==False:
+                for i in cls.players_in_hand:
+                    if i.player_pot < cls.call_value:
+                        i.action()
+                        print(i.player_pot, i.stack)
+                cls.reset_players()
+                for i in cls.players_in_hand:
+                    if i.player_pot < cls.call_value and i.stack !=0:
+                        cls.player_action(False)
+            cls.reset_call()
 
 
 class Board:
@@ -235,7 +252,7 @@ def main():
     i=0
     pot = Pot(Player.players)
 
-    while i < 1:
+    while i < 2:
         deck = Deck()
         deck.shuffle()
         pot.empty_pot()
