@@ -1,5 +1,5 @@
 import random
-
+import itertools
 
 class Card:
     def __init__(self, value, suit):
@@ -70,6 +70,9 @@ class Player:
     check_list = ["check", "Check", "CHECK"]
     allin_list = ["all", "All", "ALL"]
     action_list = fold_list+call_list+bet_list+raise_list+check_list+allin_list 
+
+    value_dict = {'J': 11, 'Q': 12, 'K': 13, 'A': 14}
+    value_dict.update((x, x) for x in range(2,11))
 
     def __init__(self, name, stack):
         self.hand = []
@@ -197,6 +200,29 @@ class Player:
                     if i.player_pot < cls.call_value and i.stack !=0:
                         cls.player_action(False)
             cls.reset_call()
+    
+    def eval_hand(self):
+        hand = self.hand
+        values = sorted([Player.value_dict[c.value] for c in hand], reverse=True)
+        suits = [c.suit for c in hand]
+        straight = (values == list(range(values[0], values[0]-5, -1))
+                    or values == [14, 5, 4, 3, 2])
+        flush = all(s == suits[0] for s in suits)
+
+        if straight and flush: return 8, values[0]
+        if flush: return 5, values
+        if straight: return 4, values[0]
+
+        trips = []
+        pairs = []
+        for v, group in itertools.groupby(values):
+            count = sum(1 for _ in group)
+            if count == 4: return 7, v, values
+            elif count == 3: trips.append(v)
+            elif count == 2: pairs.append(v)
+
+        if trips: return (6 if pairs else 3), trips, pairs, values
+        return len(pairs), pairs, values
 
 
 class Board:
@@ -292,5 +318,23 @@ def main():
 
 
 
-if __name__ == '__main__':
-    main()
+#if __name__ == '__main__':
+#    main()
+
+hands_dict = {
+  0: "High Card",
+  1: "One Pair",
+  2: "Two Pair",
+  3: "Three of a Kind",
+  4: "Straight",
+  5: "Flush",
+  6: "Full House",
+  7: "Four of a Kind",
+  8: "Straight Flush"}
+
+jacob = Player("Jacob", 2000)
+deck = Deck()
+deck.shuffle()
+jacob.draw_card(deck).draw_card(deck).draw_card(deck).draw_card(deck).draw_card(deck)
+jacob.show_hand()
+print(hands_dict[jacob.eval_hand()[0]])

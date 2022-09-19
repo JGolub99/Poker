@@ -62,3 +62,10 @@ One problem is that there is no way of creating a side pot or for a big stack to
 Also still need to create a dealer button to change order of play between games.
 
 For the moment, all of the game mechanics for player actions seems to be working as it should be. This will of course need to be play-tested with a nice UI, but for the moment I shall assume it is bug free. The next challenge is finding a way to determine who has the winning hand. For this I think I will have to do some research.
+
+
+Monday 19th September 2022:
+
+https://codereview.stackexchange.com/questions/128702/poker-hands-in-python
+
+Used the code from above to develop a function to evaluate a hand. Still need to figure out tie-breakers and for how we can use this function to incorporate both the player's cards and the board.
