@@ -69,3 +69,8 @@ Monday 19th September 2022:
 https://codereview.stackexchange.com/questions/128702/poker-hands-in-python
 
 Used the code from above to develop a function to evaluate a hand. Still need to figure out tie-breakers and for how we can use this function to incorporate both the player's cards and the board.
+
+
+Tuesday 20th September 2022:
+
+Now we have a function hand_interpreter that translates the output of eval_hand into English.

@@ -1,6 +1,23 @@
 import random
 import itertools
 
+hands_dict = {
+  0: "High Card",
+  1: "One Pair",
+  2: "Two Pair",
+  3: "Three of a Kind",
+  4: "Straight",
+  5: "Flush",
+  6: "Full House",
+  7: "Four of a Kind",
+  8: "Straight Flush"}
+
+
+face_dict = {2: "Two", 3: 'Three', 4: 'Four', 5: 'Five',
+    6: "Six", 7: "Seven", 8: "Eight", 9: "Nine", 10: 'Ten',
+    11: 'Jack', 12: 'Queen', 13: 'King', 14: 'Ace'}
+
+
 class Card:
     def __init__(self, value, suit):
         self.suit = suit
@@ -200,7 +217,10 @@ class Player:
                     if i.player_pot < cls.call_value and i.stack !=0:
                         cls.player_action(False)
             cls.reset_call()
-    
+
+# Method to provide all necessary information to determine hand and 
+# tie breaker. REQUIRE FIVE CARDS.
+
     def eval_hand(self):
         hand = self.hand
         values = sorted([Player.value_dict[c.value] for c in hand], reverse=True)
@@ -209,9 +229,9 @@ class Player:
                     or values == [14, 5, 4, 3, 2])
         flush = all(s == suits[0] for s in suits)
 
-        if straight and flush: return 8, values[0]
+        if straight and flush: return 8, values
         if flush: return 5, values
-        if straight: return 4, values[0]
+        if straight: return 4, values
 
         trips = []
         pairs = []
@@ -269,6 +289,56 @@ class Pot:
     def empty_pot(self):
         self.value = 0
 
+# This function translates the output of the hand evaluator to a statement
+# in English for the player.
+
+def hand_interpreter(my_tuple):
+    hand = hands_dict[my_tuple[0]]
+    my_card = " "
+    if hand == "High Card":
+        my_card = my_tuple[2][0]
+        my_card = face_dict[my_card]
+        return hand + ": " + my_card
+    if hand == "One Pair":
+        my_card = my_tuple[1][0]
+        my_card = face_dict[my_card]
+        return hand + ": " + my_card + "s"
+    if hand == "Two Pair":
+        my_card1 = face_dict[my_tuple[1][0]]
+        my_card2 = face_dict[my_tuple[1][1]]
+        return hand + ": " + my_card1 + "s and " + my_card2 + "s" 
+    if hand == "Three of a Kind":
+        my_card = my_tuple[1][0]
+        my_card = face_dict[my_card]
+        return hand + ": " + my_card + "s"
+    if hand == "Straight":
+        if all(x in my_tuple[1] for x in [14, 5]):
+            my_card = "Five"
+        else:
+            my_card = my_tuple[1][0]
+            my_card = face_dict[my_card]
+        return my_card + " high " + hand
+    if hand == "Flush":
+        my_card = my_tuple[1][0]
+        my_card = face_dict[my_card]
+        return my_card + " high " + hand
+    if hand == "Full House":
+        my_card1 = face_dict[my_tuple[1][0]]
+        my_card2 = face_dict[my_tuple[2][0]]
+        return my_card1 + "s full of " + my_card2 + "s"
+    if hand == "Four of a Kind":
+        my_card = face_dict[my_tuple[1]]
+        return hand + ": " + my_card + "s"
+    if hand == "Straight Flush":
+        if all(x in my_tuple[1] for x in [14, 13]):
+            return "Royal Flush"
+        if all(x in my_tuple[1] for x in [14, 5]):
+            my_card = "Five"
+            return my_card + " high " + hand
+        else:
+            my_card = face_dict[my_tuple[1][0]]
+            return my_card + " high " + hand
+         
 
 def main():
 
@@ -321,20 +391,16 @@ def main():
 #if __name__ == '__main__':
 #    main()
 
-hands_dict = {
-  0: "High Card",
-  1: "One Pair",
-  2: "Two Pair",
-  3: "Three of a Kind",
-  4: "Straight",
-  5: "Flush",
-  6: "Full House",
-  7: "Four of a Kind",
-  8: "Straight Flush"}
 
 jacob = Player("Jacob", 2000)
 deck = Deck()
 deck.shuffle()
+#jacob.hand.append(Card(10,"Hearts"))
+#jacob.hand.append(Card(1,"Hearts"))
+#jacob.hand.append(Card(13,"Hearts"))
+#jacob.hand.append(Card(12,"Hearts"))
+#jacob.hand.append(Card(11,"Hearts"))
 jacob.draw_card(deck).draw_card(deck).draw_card(deck).draw_card(deck).draw_card(deck)
 jacob.show_hand()
-print(hands_dict[jacob.eval_hand()[0]])
+#print(jacob.eval_hand())
+print(hand_interpreter(jacob.eval_hand()))
