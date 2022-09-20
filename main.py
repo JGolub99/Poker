@@ -233,9 +233,9 @@ class Player:
                     or values == [14, 5, 4, 3, 2])
         flush = all(s == suits[0] for s in suits)
 
-        if straight and flush: return 8, values
-        if flush: return 5, values
-        if straight: return 4, values
+        if straight and flush: return 8, "palceholder", values
+        if flush: return 5, "placeholder", values
+        if straight: return 4, "placeholder", values
 
         trips = []
         pairs = []
@@ -245,7 +245,7 @@ class Player:
             elif count == 3: trips.append(v)
             elif count == 2: pairs.append(v)
 
-        if trips: return (6 if pairs else 3), trips, pairs, values
+        if trips: return (6 if pairs else 3), trips, values, pairs
         return len(pairs), pairs, values
 
 
@@ -274,6 +274,9 @@ class Board:
     def show_board(self):
         for c in self.board:
             c.show()
+    
+    def clear_board(self):
+        self.board = []
 
 
 class Pot:
@@ -316,31 +319,31 @@ def hand_interpreter(my_tuple):
         my_card = face_dict[my_card]
         return hand + ": " + my_card + "s"
     if hand == "Straight":
-        if all(x in my_tuple[1] for x in [14, 5]):
+        if all(x in my_tuple[2] for x in [14, 5]):
             my_card = "Five"
         else:
-            my_card = my_tuple[1][0]
+            my_card = my_tuple[2][0]
             my_card = face_dict[my_card]
         return my_card + " high " + hand
     if hand == "Flush":
-        my_card = my_tuple[1][0]
+        my_card = my_tuple[2][0]
         my_card = face_dict[my_card]
         return my_card + " high " + hand
     if hand == "Full House":
         my_card1 = face_dict[my_tuple[1][0]]
-        my_card2 = face_dict[my_tuple[2][0]]
+        my_card2 = face_dict[my_tuple[3][0]]
         return my_card1 + "s full of " + my_card2 + "s"
     if hand == "Four of a Kind":
         my_card = face_dict[my_tuple[1]]
         return hand + ": " + my_card + "s"
     if hand == "Straight Flush":
-        if all(x in my_tuple[1] for x in [14, 13]):
+        if all(x in my_tuple[2] for x in [14, 13]):
             return "Royal Flush"
-        if all(x in my_tuple[1] for x in [14, 5]):
+        if all(x in my_tuple[2] for x in [14, 5]):
             my_card = "Five"
             return my_card + " high " + hand
         else:
-            my_card = face_dict[my_tuple[1][0]]
+            my_card = face_dict[my_tuple[2][0]]
             return my_card + " high " + hand
 
 # This function compares two hands, either for 1 or 2 players.
@@ -350,22 +353,122 @@ def compare_hands(player1, player2=None):
     if player2==None:
         score2 = player1.eval_hand(2)
         if score1[0]<score2[0]:
-            print("Score 2 wins")
+            #print("Score 2 wins")
             return player1.temp_hand
     else:
         score2 = player2.eval_hand(1)
         if score1[0]<score2[0]:
+            #print("Score 2 wins")
             return player2.hand
     
     if score1[0]>score2[0]:
-        print("Score 1 wins")
+        #print("Score 1 wins")
         return player1.hand
     
     if score1[0]==score2[0]:
-        print("Tie")
-        return player1.hand
- 
-    
+        #print("Tie")
+        if score1[0]==0 or score1[0]==4 or score1[0]==5 or score1[0]==8:
+            i = 0
+            ans = "Tie"
+            while i <= 4 and ans == "Tie":
+                ans = highcard_tiebreak(score1[2], score2[2], i)
+                if ans == "One":
+                    return player1.hand
+                elif ans == "Two" and player2 == None:
+                    return player1.temp_hand
+                elif ans == "Two" and player2 != None:
+                    return player2.hand
+                i+=1
+            if i == 5:
+                return player1.hand
+        elif score1[0]==1 or score1[0]==3 or score1[0]==7:
+            if score1[1]>score2[1]:
+                return player1.hand
+            elif score1[1]<score2[1] and player2==None:
+                return player1.temp_hand
+            elif score1[1]<score2[1] and player2!=None:
+                return player2.hand
+            elif score1[1]==score2[1]:
+                i = 0
+                ans = "Tie"
+                while i <= 4 and ans == "Tie":
+                    ans = highcard_tiebreak(score1[2], score2[2], i)
+                    if ans == "One":
+                        return player1.hand
+                    elif ans == "Two" and player2 == None:
+                        return player1.temp_hand
+                    elif ans == "Two" and player2 != None:
+                        return player2.hand
+                    i+=1
+                if i == 5:
+                    return player1.hand
+        elif score1[0]==2:
+            if score1[1][0]>score2[1][0]:
+                return player1.hand
+            elif score1[1][0]<score2[1][0] and player2==None:
+                return player1.temp_hand
+            elif score1[1][0]<score2[1][0] and player2!=None:
+                return player2.hand
+            elif score1[1][0]==score2[1][0]:
+                if score1[1][1]>score2[1][1]:
+                    return player1.hand
+                elif score1[1][1]<score2[1][1] and player2==None:
+                    return player1.temp_hand
+                elif score1[1][1]<score2[1][1] and player2!=None:
+                    return player2.hand
+                elif score1[1][1]==score2[1][1]:
+                    i = 0
+                    ans = "Tie"
+                    while i <= 4 and ans == "Tie":
+                        ans = highcard_tiebreak(score1[2], score2[2], i)
+                        if ans == "One":
+                            return player1.hand
+                        elif ans == "Two" and player2 == None:
+                            return player1.temp_hand
+                        elif ans == "Two" and player2 != None:
+                            return player2.hand
+                        i+=1
+                    if i == 5:
+                        return player1.hand
+        elif score1[0]==6:
+            if score1[1][0]>score2[1][0]:
+                return player1.hand
+            elif score1[1][0]<score2[1][0] and player2==None:
+                return player1.temp_hand
+            elif score1[1][0]<score2[1][0] and player2!=None:
+                return player2.hand
+            elif score1[1][0]==score2[1][0]:
+                if score1[3][0]>score2[3][0]:
+                    return player1.hand
+                elif score1[3][0]<score2[3][0] and player2==None:
+                    return player1.temp_hand
+                elif score1[3][0]<score2[3][0] and player2!=None:
+                    return player2.hand
+                elif score1[3][0]==score2[3][0]:
+                    i = 0
+                    ans = "Tie"
+                    while i <= 4 and ans == "Tie":
+                        ans = highcard_tiebreak(score1[2], score2[2], i)
+                        if ans == "One":
+                            return player1.hand
+                        elif ans == "Two" and player2 == None:
+                            return player1.temp_hand
+                        elif ans == "Two" and player2 != None:
+                            return player2.hand
+                        i+=1
+                    if i == 5:
+                        return player1.hand
+
+                
+# This function breaks high card ties.
+
+def highcard_tiebreak(vals1, vals2, iter):
+    if vals1[iter]>vals2[iter]:
+        return "One"
+    elif vals1[iter]<vals2[iter]:
+        return "Two"
+    elif vals1[iter]==vals2[iter]:
+        return "Tie"
 
 # This function accepts a player and board to determine the player's
 # best possible hand.
@@ -444,3 +547,18 @@ if __name__ == '__main__':
 #jacob.show_hand()
 #print(jacob.eval_hand(2))
 #print(hand_interpreter(jacob.eval_hand(2)))
+
+#jacob = Player("Jacob", 2000)
+#deck = Deck()
+#deck.shuffle()
+#jacob.hand.append(Card(11,"Spades"))
+#jacob.hand.append(Card(9,"Spades"))
+#my_board=Board(deck)
+#my_board.clear_board()
+#my_board.board.append(Card(7,"Hearts"))
+#my_board.board.append(Card(11,"Hearts"))
+#my_board.board.append(Card(9,"Diamonds"))
+#my_board.board.append(Card(9,"Clubs"))
+#my_board.board.append(Card(11,"Diamonds"))
+#print(find_best_hand(jacob, my_board))
+
