@@ -93,6 +93,7 @@ class Player:
 
     def __init__(self, name, stack):
         self.hand = []
+        self.temp_hand = [] # For comparing with board cards
         self.foldi = False
         self.player_pot = 0
         self.name = name
@@ -221,8 +222,11 @@ class Player:
 # Method to provide all necessary information to determine hand and 
 # tie breaker. REQUIRE FIVE CARDS.
 
-    def eval_hand(self):
-        hand = self.hand
+    def eval_hand(self, setting=1):
+        if setting == 1:
+            hand = self.hand
+        elif setting == 2:
+            hand = self.temp_hand
         values = sorted([Player.value_dict[c.value] for c in hand], reverse=True)
         suits = [c.suit for c in hand]
         straight = (values == list(range(values[0], values[0]-5, -1))
@@ -338,7 +342,42 @@ def hand_interpreter(my_tuple):
         else:
             my_card = face_dict[my_tuple[1][0]]
             return my_card + " high " + hand
-         
+
+# This function compares two hands, either for 1 or 2 players.
+
+def compare_hands(player1, player2=None):
+    score1 = player1.eval_hand(1)
+    if player2==None:
+        score2 = player1.eval_hand(2)
+        if score1[0]<score2[0]:
+            print("Score 2 wins")
+            return player1.temp_hand
+    else:
+        score2 = player2.eval_hand(1)
+        if score1[0]<score2[0]:
+            return player2.hand
+    
+    if score1[0]>score2[0]:
+        print("Score 1 wins")
+        return player1.hand
+    
+    if score1[0]==score2[0]:
+        print("Tie")
+        return player1.hand
+ 
+    
+
+# This function accepts a player and board to determine the player's
+# best possible hand.
+
+def find_best_hand(player, myboard):
+    list_of_cards = player.hand + myboard.board
+    combinations = list(itertools.combinations(list_of_cards,5))
+    player.hand = list(combinations[0])
+    for i in range(1,21):
+        player.temp_hand = list(combinations[i])
+        player.hand = compare_hands(player)
+    return hand_interpreter(player.eval_hand())    
 
 def main():
 
@@ -348,7 +387,7 @@ def main():
     i=0
     pot = Pot(Player.players)
 
-    while i < 2:
+    while i < 1:
         deck = Deck()
         deck.shuffle()
         pot.empty_pot()
@@ -381,6 +420,7 @@ def main():
         board.show_board()
         Player.player_action()
         pot.collect_bets()
+        print(find_best_hand(jacob, board))
         pot.show_value()
         Player.reset_folders()
         Player.discard_hands()
@@ -388,19 +428,19 @@ def main():
 
 
 
-#if __name__ == '__main__':
-#    main()
+if __name__ == '__main__':
+    main()
 
 
-jacob = Player("Jacob", 2000)
-deck = Deck()
-deck.shuffle()
-#jacob.hand.append(Card(10,"Hearts"))
-#jacob.hand.append(Card(1,"Hearts"))
-#jacob.hand.append(Card(13,"Hearts"))
-#jacob.hand.append(Card(12,"Hearts"))
-#jacob.hand.append(Card(11,"Hearts"))
-jacob.draw_card(deck).draw_card(deck).draw_card(deck).draw_card(deck).draw_card(deck)
-jacob.show_hand()
-#print(jacob.eval_hand())
-print(hand_interpreter(jacob.eval_hand()))
+#jacob = Player("Jacob", 2000)
+#deck = Deck()
+#deck.shuffle()
+#jacob.temp_hand.append(Card(10,"Hearts"))
+#jacob.temp_hand.append(Card(1,"Hearts"))
+#jacob.temp_hand.append(Card(13,"Hearts"))
+#jacob.temp_hand.append(Card(12,"Hearts"))
+#jacob.temp_hand.append(Card(11,"Hearts"))
+#jacob.draw_card(deck).draw_card(deck).draw_card(deck).draw_card(deck).draw_card(deck)
+#jacob.show_hand()
+#print(jacob.eval_hand(2))
+#print(hand_interpreter(jacob.eval_hand(2)))

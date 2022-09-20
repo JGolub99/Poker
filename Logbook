@@ -74,3 +74,5 @@ Used the code from above to develop a function to evaluate a hand. Still need to
 Tuesday 20th September 2022:
 
 Now we have a function hand_interpreter that translates the output of eval_hand into English.
+
+We also now have a function that can figure out the highest class of hand that a player has. Note that it cannot yet figure out the EXACT best hand because the function doesn't have tie breaker just yet. This is the next challenge, for which I will use some logic.
