@@ -80,3 +80,7 @@ We also now have a function that can figure out the highest class of hand that a
 The tie-breaker function is now coded and implemented in the highest hand function. We can now deduce exactly what a player's best hand is!
 
 The code will need to be slightly modified for when we are comparing two players' hands, but this should not be too hard.
+
+I have also now addressed the above problem, and added functionality for a split pot. We can now determine the winner of a game. Just need to add a method for transferring the pot to the winner's stack. This is now done!
+
+The next step is to code in the blinds and the dealer button to alternate order of play. Also eventually the issue of sidepots and refunds on an all in will need to be addressed. However, I'd be happy to begin work on a UI before then as this is a small often unnecesary game mechanic.

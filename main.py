@@ -113,6 +113,11 @@ class Player:
         for c in self.hand:
             c.show()
 
+# Method to add winnings to stack
+
+    def add_to_stack(self, amount):
+        self.stack += amount
+
 #Method to reset players_in_hand between folds and games:
     @classmethod
     def reset_players(cls):
@@ -247,6 +252,17 @@ class Player:
 
         if trips: return (6 if pairs else 3), trips, values, pairs
         return len(pairs), pairs, values
+    
+    @classmethod
+    def find_winner(cls):
+        winner = [cls.players_in_hand[0]]
+        for i in range(1, len(cls.players_in_hand)):
+            temp = compare_hands(winner[0], cls.players_in_hand[i])[1]
+            if temp=="Split pot":
+                winner.append(cls.players_in_hand[i])
+            else:
+                winner = [temp]
+        return winner
 
 
 class Board:
@@ -354,16 +370,16 @@ def compare_hands(player1, player2=None):
         score2 = player1.eval_hand(2)
         if score1[0]<score2[0]:
             #print("Score 2 wins")
-            return player1.temp_hand
+            return player1.temp_hand, player1
     else:
         score2 = player2.eval_hand(1)
         if score1[0]<score2[0]:
             #print("Score 2 wins")
-            return player2.hand
+            return player2.hand, player2
     
     if score1[0]>score2[0]:
         #print("Score 1 wins")
-        return player1.hand
+        return player1.hand, player1
     
     if score1[0]==score2[0]:
         #print("Tie")
@@ -373,91 +389,99 @@ def compare_hands(player1, player2=None):
             while i <= 4 and ans == "Tie":
                 ans = highcard_tiebreak(score1[2], score2[2], i)
                 if ans == "One":
-                    return player1.hand
+                    return player1.hand, player1
                 elif ans == "Two" and player2 == None:
-                    return player1.temp_hand
+                    return player1.temp_hand, player1
                 elif ans == "Two" and player2 != None:
-                    return player2.hand
+                    return player2.hand, player2
                 i+=1
-            if i == 5:
-                return player1.hand
+            if i==5 and player2 == None:
+                return player1.hand, player1
+            elif i==5 and player2!=None:
+                return "placeholder", "Split pot"
         elif score1[0]==1 or score1[0]==3 or score1[0]==7:
             if score1[1]>score2[1]:
-                return player1.hand
+                return player1.hand, player1
             elif score1[1]<score2[1] and player2==None:
-                return player1.temp_hand
+                return player1.temp_hand, player1
             elif score1[1]<score2[1] and player2!=None:
-                return player2.hand
+                return player2.hand, player2
             elif score1[1]==score2[1]:
                 i = 0
                 ans = "Tie"
                 while i <= 4 and ans == "Tie":
                     ans = highcard_tiebreak(score1[2], score2[2], i)
                     if ans == "One":
-                        return player1.hand
+                        return player1.hand, player1
                     elif ans == "Two" and player2 == None:
-                        return player1.temp_hand
+                        return player1.temp_hand, player1
                     elif ans == "Two" and player2 != None:
-                        return player2.hand
+                        return player2.hand, player2
                     i+=1
-                if i == 5:
-                    return player1.hand
+                if i==5 and player2==None:
+                    return player1.hand, player2
+                elif i==5 and player2!=None:
+                    return "placeholder", "Split pot"
         elif score1[0]==2:
             if score1[1][0]>score2[1][0]:
-                return player1.hand
+                return player1.hand, player1
             elif score1[1][0]<score2[1][0] and player2==None:
-                return player1.temp_hand
+                return player1.temp_hand, player1
             elif score1[1][0]<score2[1][0] and player2!=None:
-                return player2.hand
+                return player2.hand, player2
             elif score1[1][0]==score2[1][0]:
                 if score1[1][1]>score2[1][1]:
-                    return player1.hand
+                    return player1.hand, player1
                 elif score1[1][1]<score2[1][1] and player2==None:
-                    return player1.temp_hand
+                    return player1.temp_hand, player1
                 elif score1[1][1]<score2[1][1] and player2!=None:
-                    return player2.hand
+                    return player2.hand, player2
                 elif score1[1][1]==score2[1][1]:
                     i = 0
                     ans = "Tie"
                     while i <= 4 and ans == "Tie":
                         ans = highcard_tiebreak(score1[2], score2[2], i)
                         if ans == "One":
-                            return player1.hand
+                            return player1.hand, player1
                         elif ans == "Two" and player2 == None:
-                            return player1.temp_hand
+                            return player1.temp_hand, player1
                         elif ans == "Two" and player2 != None:
-                            return player2.hand
+                            return player2.hand, player2
                         i+=1
-                    if i == 5:
-                        return player1.hand
+                    if i==5 and player2==None:
+                        return player1.hand, player1
+                    elif i==5 and player2!=None:
+                        return "placeholder", "Split pot"
         elif score1[0]==6:
             if score1[1][0]>score2[1][0]:
-                return player1.hand
+                return player1.hand, player1
             elif score1[1][0]<score2[1][0] and player2==None:
-                return player1.temp_hand
+                return player1.temp_hand, player1
             elif score1[1][0]<score2[1][0] and player2!=None:
-                return player2.hand
+                return player2.hand, player2
             elif score1[1][0]==score2[1][0]:
                 if score1[3][0]>score2[3][0]:
-                    return player1.hand
+                    return player1.hand, player1
                 elif score1[3][0]<score2[3][0] and player2==None:
-                    return player1.temp_hand
+                    return player1.temp_hand, player1
                 elif score1[3][0]<score2[3][0] and player2!=None:
-                    return player2.hand
+                    return player2.hand, player2
                 elif score1[3][0]==score2[3][0]:
                     i = 0
                     ans = "Tie"
                     while i <= 4 and ans == "Tie":
                         ans = highcard_tiebreak(score1[2], score2[2], i)
                         if ans == "One":
-                            return player1.hand
+                            return player1.hand, player1
                         elif ans == "Two" and player2 == None:
-                            return player1.temp_hand
+                            return player1.temp_hand, player1
                         elif ans == "Two" and player2 != None:
-                            return player2.hand
+                            return player2.hand, player2
                         i+=1
-                    if i == 5:
-                        return player1.hand
+                    if i==5 and player2==None:
+                        return player1.hand, player1
+                    elif i==5 and player2!=None:
+                        return "placeholder", "Split pot"
 
                 
 # This function breaks high card ties.
@@ -479,7 +503,7 @@ def find_best_hand(player, myboard):
     player.hand = list(combinations[0])
     for i in range(1,21):
         player.temp_hand = list(combinations[i])
-        player.hand = compare_hands(player)
+        player.hand = compare_hands(player)[0]
     return hand_interpreter(player.eval_hand())    
 
 def main():
@@ -491,6 +515,7 @@ def main():
     pot = Pot(Player.players)
 
     while i < 1:
+        print("")
         deck = Deck()
         deck.shuffle()
         pot.empty_pot()
@@ -521,13 +546,29 @@ def main():
         input("Draw river: \n")
         board.draw_river(deck)
         board.show_board()
+        print("")
         Player.player_action()
         pot.collect_bets()
-        print(find_best_hand(jacob, board))
-        pot.show_value()
+        print("")
+        for j in Player.players_in_hand:
+            print(j.name,", ", find_best_hand(j,board))
+            j.show_hand()
+            print("")
+        winner = Player.find_winner()
+        if len(winner)>1:
+            print("Split pot!")
+            winnings = pot.value/len(winner)
+            for i in winner:
+                i.add_to_stack(winnings)
+        else:
+            print(winner[0].name + " wins!")
+            winner[0].add_to_stack(pot.value)
+            print(winner[0].stack)
+        pot.empty_pot()
         Player.reset_folders()
         Player.discard_hands()
         i+=1
+        input("\n Next game: ")
 
 
 
