@@ -84,3 +84,10 @@ The code will need to be slightly modified for when we are comparing two players
 I have also now addressed the above problem, and added functionality for a split pot. We can now determine the winner of a game. Just need to add a method for transferring the pot to the winner's stack. This is now done!
 
 The next step is to code in the blinds and the dealer button to alternate order of play. Also eventually the issue of sidepots and refunds on an all in will need to be addressed. However, I'd be happy to begin work on a UI before then as this is a small often unnecesary game mechanic.
+
+https://www.888poker.com/poker/poker-odds-calculator
+
+
+Wedesday 21st September 2022:
+
+I have now added a dealer and blinds mechanism. By default the first instantiated player starts as the dealer, and the button will move onto whoever is next. One still occuring problem is that the order of play isn't changing yet based on the position of the button. This will need to be addressed.

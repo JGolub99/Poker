@@ -1,5 +1,6 @@
 import random
 import itertools
+import numpy as np
 
 hands_dict = {
   0: "High Card",
@@ -79,6 +80,8 @@ class Player:
     call_value = 0
     players = []
     players_in_hand = []
+    blinds_dict = {}
+    dealer_position = 1
 
     fold_list = ["fold", "Fold", "FOLD"]
     call_list = ["call", "Call", "CALL"]
@@ -100,6 +103,7 @@ class Player:
         self.stack = stack
         Player.num_players += 1
         Player.players.append(self)
+        Player.update_dict()
 
 # Method to draw card from a given deck, chainable
 
@@ -142,6 +146,29 @@ class Player:
     def discard_hands(cls):
         for i in cls.players:
             i.hand.clear()
+
+# Method to collect blinds and move dealer button
+    @classmethod
+    def collect_blinds(cls, pot, big_blind):
+        small_blind_position = cls.dealer_position+1
+        small_blind_key = round((small_blind_position/cls.num_players)%1,2)
+        big_blind_position = cls.dealer_position+2
+        big_blind_key = round((big_blind_position/cls.num_players)%1,2)
+        cls.players[cls.blinds_dict[small_blind_key]].stack-=0.5*big_blind
+        cls.players[cls.blinds_dict[big_blind_key]].stack-=big_blind
+        pot.increase_pot(1.5*big_blind)
+        cls.dealer_position+=1
+
+# Method to update the blinds dictionary
+    @classmethod
+    def update_dict(cls):
+        cls.blinds_dict = {}
+        keys = np.linspace(0,1,cls.num_players+1)[1:]
+        outputs = range(0,cls.num_players)
+        for i in outputs:
+            cls.blinds_dict.update([(round(keys[i]%1,2),i)])
+
+        
 
 # Action methods
 
@@ -311,6 +338,12 @@ class Pot:
 
     def empty_pot(self):
         self.value = 0
+    
+    def increase_pot(self, amount):
+        self.value = self.value+amount
+    
+    def decrease_pot(self, amount):
+        self.value = self.value-amount
 
 # This function translates the output of the hand evaluator to a statement
 # in English for the player.
@@ -514,12 +547,13 @@ def main():
     i=0
     pot = Pot(Player.players)
 
-    while i < 1:
+    while i < 4:
         print("")
         deck = Deck()
         deck.shuffle()
         pot.empty_pot()
         Player.reset_players()
+        Player.collect_blinds(pot,100)
         jacob.draw_card(deck).draw_card(deck)
         print(jacob.name, jacob.stack, ":")
         jacob.show_hand()
@@ -529,6 +563,9 @@ def main():
         lia.show_hand()
         print("")
         sam.draw_card(deck).draw_card(deck)
+        print(sam.name, sam.stack, ":")
+        sam.show_hand()
+        print("")
         Player.player_action()
         pot.collect_bets()
         input("Draw flop: \n")
@@ -558,8 +595,8 @@ def main():
         if len(winner)>1:
             print("Split pot!")
             winnings = pot.value/len(winner)
-            for i in winner:
-                i.add_to_stack(winnings)
+            for k in winner:
+                k.add_to_stack(winnings)
         else:
             print(winner[0].name + " wins!")
             winner[0].add_to_stack(pot.value)
