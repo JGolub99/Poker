@@ -103,7 +103,7 @@ class Player:
         self.stack = stack
         Player.num_players += 1
         Player.players.append(self)
-        Player.update_dict()
+        #Player.update_dict()   This was from an older blinds method
 
 # Method to draw card from a given deck, chainable
 
@@ -148,6 +148,7 @@ class Player:
             i.hand.clear()
 
 # Method to collect blinds and move dealer button
+# NOT REQUIRED ANYMORE!
     @classmethod
     def collect_blinds(cls, pot, big_blind):
         small_blind_position = cls.dealer_position+1
@@ -158,6 +159,18 @@ class Player:
         cls.players[cls.blinds_dict[big_blind_key]].stack-=big_blind
         pot.increase_pot(1.5*big_blind)
         cls.dealer_position+=1
+
+# Alternative method to collecting blinds
+    @classmethod
+    def collect_blinds_two(cls, pot, big_blind):
+        cls.players[1].stack-=0.5*big_blind
+        cls.players[2].stack-=big_blind
+        pot.increase_pot(1.5*big_blind) 
+
+# Method to change order of play
+    @classmethod
+    def change_order(cls):
+        cls.players = rotate(cls.players,1)
 
 # Method to update the blinds dictionary
     @classmethod
@@ -539,6 +552,12 @@ def find_best_hand(player, myboard):
         player.hand = compare_hands(player)[0]
     return hand_interpreter(player.eval_hand())    
 
+# This function rotates a list
+
+def rotate(l, n):
+    return l[n:] + l[:n]
+
+
 def main():
 
     jacob = Player("Jacob", 2000)
@@ -547,13 +566,13 @@ def main():
     i=0
     pot = Pot(Player.players)
 
-    while i < 4:
+    while i < 2:
         print("")
         deck = Deck()
         deck.shuffle()
         pot.empty_pot()
         Player.reset_players()
-        Player.collect_blinds(pot,100)
+        Player.collect_blinds_two(pot,100)
         jacob.draw_card(deck).draw_card(deck)
         print(jacob.name, jacob.stack, ":")
         jacob.show_hand()
@@ -605,6 +624,7 @@ def main():
         Player.reset_folders()
         Player.discard_hands()
         i+=1
+        Player.change_order()
         input("\n Next game: ")
 
 

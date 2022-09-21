@@ -91,3 +91,7 @@ https://www.888poker.com/poker/poker-odds-calculator
 Wedesday 21st September 2022:
 
 I have now added a dealer and blinds mechanism. By default the first instantiated player starts as the dealer, and the button will move onto whoever is next. One still occuring problem is that the order of play isn't changing yet based on the position of the button. This will need to be addressed.
+
+This has been addressed by using a method to shuffle the list of players, provided at: https://stackoverflow.com/questions/2150108/efficient-way-to-rotate-a-list-in-python
+This also has made paying blinds much easier so a new blinds method has also been made, the blinds_dictionary is no longer necessary.
+We can now collect blinds and change the order of play!
