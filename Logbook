@@ -95,3 +95,8 @@ I have now added a dealer and blinds mechanism. By default the first instantiate
 This has been addressed by using a method to shuffle the list of players, provided at: https://stackoverflow.com/questions/2150108/efficient-way-to-rotate-a-list-in-python
 This also has made paying blinds much easier so a new blinds method has also been made, the blinds_dictionary is no longer necessary.
 We can now collect blinds and change the order of play!
+
+
+Thursday 22nd September 2022:
+
+Made small update to collect_blinds_two so that players have to call the blinds rather than paying nothing to be in the hand.

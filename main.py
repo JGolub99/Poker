@@ -162,10 +162,9 @@ class Player:
 
 # Alternative method to collecting blinds
     @classmethod
-    def collect_blinds_two(cls, pot, big_blind):
-        cls.players[1].stack-=0.5*big_blind
-        cls.players[2].stack-=big_blind
-        pot.increase_pot(1.5*big_blind) 
+    def collect_blinds_two(cls, big_blind):
+        cls.players[1].bet(0.5*big_blind)
+        cls.players[2].bet(big_blind) 
 
 # Method to change order of play
     @classmethod
@@ -173,6 +172,7 @@ class Player:
         cls.players = rotate(cls.players,1)
 
 # Method to update the blinds dictionary
+# NOT REQUIRED ANYMORE!
     @classmethod
     def update_dict(cls):
         cls.blinds_dict = {}
@@ -572,7 +572,7 @@ def main():
         deck.shuffle()
         pot.empty_pot()
         Player.reset_players()
-        Player.collect_blinds_two(pot,100)
+        Player.collect_blinds_two(100)
         jacob.draw_card(deck).draw_card(deck)
         print(jacob.name, jacob.stack, ":")
         jacob.show_hand()
