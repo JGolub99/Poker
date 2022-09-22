@@ -87,7 +87,7 @@ class Player:
     call_list = ["call", "Call", "CALL"]
     bet_list = ["bet", "Bet", "BET"]
     raise_list = ["raise", "Raise", "RAISE"]
-    check_list = ["check", "Check", "CHECK"]
+    check_list = ["c", "check", "Check", "CHECK"]
     allin_list = ["all", "All", "ALL"]
     action_list = fold_list+call_list+bet_list+raise_list+check_list+allin_list 
 
@@ -559,32 +559,34 @@ def rotate(l, n):
 
 
 def main():
+    # ======================
+    # Set players here:
+    Player("Jacob", 2000)
+    Player("Lia", 1000)
+    Player("Sam", 1000)
+    # ======================
 
-    jacob = Player("Jacob", 2000)
-    lia = Player("Lia", 1000)
-    sam = Player("Sam", 1000)
+    # ========================================
+    # Set number of games and big blind here:
+    big_blind = 100
+    number_of_games = 5
+    # ========================================
+
     i=0
     pot = Pot(Player.players)
 
-    while i < 2:
+    while i < number_of_games:
         print("")
         deck = Deck()
         deck.shuffle()
         pot.empty_pot()
         Player.reset_players()
-        Player.collect_blinds_two(100)
-        jacob.draw_card(deck).draw_card(deck)
-        print(jacob.name, jacob.stack, ":")
-        jacob.show_hand()
-        print("")
-        lia.draw_card(deck).draw_card(deck)
-        print(lia.name, lia.stack, ":")
-        lia.show_hand()
-        print("")
-        sam.draw_card(deck).draw_card(deck)
-        print(sam.name, sam.stack, ":")
-        sam.show_hand()
-        print("")
+        Player.collect_blinds_two(big_blind)
+        for p in Player.players:
+            p.draw_card(deck).draw_card(deck)
+            print(p.name, p.stack, ":")
+            p.show_hand()
+            print("")
         Player.player_action()
         pot.collect_bets()
         input("Draw flop: \n")
