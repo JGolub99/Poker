@@ -232,7 +232,7 @@ class Player:
                     print("Illegal play ")
                     self.action()
             if x_list[0] in Player.check_list:
-                if Player.call_value>0:
+                if Player.call_value>0 and Player.call_value!=self.player_pot:
                     print("Illegal play ")
                     self.action()
                 else:
