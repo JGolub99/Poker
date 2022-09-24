@@ -163,8 +163,8 @@ class Player:
 # Alternative method to collecting blinds
     @classmethod
     def collect_blinds_two(cls, big_blind):
-        cls.players[1].bet(0.5*big_blind)
-        cls.players[2].bet(big_blind) 
+        cls.players[-2].bet(0.5*big_blind)
+        cls.players[-1].bet(big_blind) 
 
 # Method to change order of play
     @classmethod
@@ -564,6 +564,8 @@ def main():
     Player("Jacob", 2000)
     Player("Lia", 1000)
     Player("Sam", 1000)
+    Player("Ben", 1000)
+    Player ("Emma", 1000)
     # ======================
 
     # ========================================
