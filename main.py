@@ -394,7 +394,7 @@ def hand_interpreter(my_tuple):
     if hand == "Full House":
         my_card1 = face_dict[my_tuple[1][0]]
         my_card2 = face_dict[my_tuple[3][0]]
-        return my_card1 + "s full of " + my_card2 + "s"
+        return hand + ": " + my_card1 + "s full of " + my_card2 + "s"
     if hand == "Four of a Kind":
         my_card = face_dict[my_tuple[1]]
         return hand + ": " + my_card + "s"
