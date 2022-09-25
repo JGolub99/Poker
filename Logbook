@@ -100,3 +100,10 @@ We can now collect blinds and change the order of play!
 Thursday 22nd September 2022:
 
 Made small update to collect_blinds_two so that players have to call the blinds rather than paying nothing to be in the hand.
+
+
+Saturday 24th September 2022:
+
+I am now going to attempt to make a GUI for this game. I will be using the package Tkinter, with a lot of help from the following tutorial:
+https://www.youtube.com/watch?v=YXPyB4XeYLA
+
