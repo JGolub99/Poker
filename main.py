@@ -15,8 +15,8 @@ hands_dict = {
 
 
 face_dict = {2: "Two", 3: 'Three', 4: 'Four', 5: 'Five',
-    6: "Six", 7: "Seven", 8: "Eight", 9: "Nine", 10: 'Ten',
-    11: 'Jack', 12: 'Queen', 13: 'King', 14: 'Ace'}
+             6: "Six", 7: "Seven", 8: "Eight", 9: "Nine", 10: 'Ten',
+             11: 'Jack', 12: 'Queen', 13: 'King', 14: 'Ace'}
 
 
 class Card:
@@ -92,18 +92,18 @@ class Player:
     action_list = fold_list+call_list+bet_list+raise_list+check_list+allin_list 
 
     value_dict = {'J': 11, 'Q': 12, 'K': 13, 'A': 14}
-    value_dict.update((x, x) for x in range(2,11))
+    value_dict.update((x, x) for x in range(2, 11))
 
     def __init__(self, name, stack):
         self.hand = []
-        self.temp_hand = [] # For comparing with board cards
+        self.temp_hand = []  # For comparing with board cards
         self.foldi = False
         self.player_pot = 0
         self.name = name
         self.stack = stack
         Player.num_players += 1
         Player.players.append(self)
-        #Player.update_dict()   This was from an older blinds method
+        # Player.update_dict()   This was from an older blinds method
 
 # Method to draw card from a given deck, chainable
 
@@ -122,18 +122,18 @@ class Player:
     def add_to_stack(self, amount):
         self.stack += amount
 
-#Method to reset players_in_hand between folds and games:
+# Method to reset players_in_hand between folds and games:
     @classmethod
     def reset_players(cls):
         cls.players_in_hand.clear()
         for i in cls.players:
-            if i.foldi == False:
-               cls.players_in_hand.append(i)
+            if not i.foldi:
+                cls.players_in_hand.append(i)
 
 # Method to reset call value between bets:
     @classmethod
     def reset_call(cls):
-       cls.call_value=0
+        cls.call_value = 0
 
 # Method to reset fold values to False for all players at table
     @classmethod
@@ -152,13 +152,13 @@ class Player:
     @classmethod
     def collect_blinds(cls, pot, big_blind):
         small_blind_position = cls.dealer_position+1
-        small_blind_key = round((small_blind_position/cls.num_players)%1,2)
+        small_blind_key = round((small_blind_position/cls.num_players) % 1, 2)
         big_blind_position = cls.dealer_position+2
-        big_blind_key = round((big_blind_position/cls.num_players)%1,2)
-        cls.players[cls.blinds_dict[small_blind_key]].stack-=0.5*big_blind
-        cls.players[cls.blinds_dict[big_blind_key]].stack-=big_blind
+        big_blind_key = round((big_blind_position/cls.num_players) % 1, 2)
+        cls.players[cls.blinds_dict[small_blind_key]].stack -= 0.5*big_blind
+        cls.players[cls.blinds_dict[big_blind_key]].stack -= big_blind
         pot.increase_pot(1.5*big_blind)
-        cls.dealer_position+=1
+        cls.dealer_position += 1
 
 # Alternative method to collecting blinds
     @classmethod
@@ -169,19 +169,17 @@ class Player:
 # Method to change order of play
     @classmethod
     def change_order(cls):
-        cls.players = rotate(cls.players,1)
+        cls.players = rotate(cls.players, 1)
 
 # Method to update the blinds dictionary
 # NOT REQUIRED ANYMORE!
     @classmethod
     def update_dict(cls):
         cls.blinds_dict = {}
-        keys = np.linspace(0,1,cls.num_players+1)[1:]
-        outputs = range(0,cls.num_players)
+        keys = np.linspace(0, 1 , cls.num_players+1)[1:]
+        outputs = range(0, cls.num_players)
         for i in outputs:
-            cls.blinds_dict.update([(round(keys[i]%1,2),i)])
-
-        
+            cls.blinds_dict.update([(round(keys[i] % 1, 2), i)])
 
 # Action methods
 
@@ -206,13 +204,13 @@ class Player:
 # Method to request action from player
 
     def action(self):
-        if self.stack!=0:
+        if self.stack != 0:
             x = input("{} action: ".format(self.name))
             x_list = x.split()
             if x_list[0] in Player.fold_list:
                 self.fold()
             if x_list[0] in Player.bet_list:
-                if int(x_list[1])>self.stack or Player.call_value>0:
+                if int(x_list[1]) > self.stack or Player.call_value > 0:
                     print("Illegal play ")
                     self.action()
                 else:
@@ -226,13 +224,13 @@ class Player:
                 else:
                     self.call()
             if x_list[0] in Player.raise_list:
-                if int(x_list[1])>Player.call_value and int(x_list[1])<=(self.stack+self.player_pot):
-                   self.bet(int(x_list[1]))
+                if Player.call_value < int(x_list[1]) <= (self.stack+self.player_pot):
+                    self.bet(int(x_list[1]))
                 else:
                     print("Illegal play ")
                     self.action()
             if x_list[0] in Player.check_list:
-                if Player.call_value>0 and Player.call_value!=self.player_pot:
+                if Player.call_value > 0 and Player.call_value != self.player_pot:
                     print("Illegal play ")
                     self.action()
                 else:
@@ -244,28 +242,28 @@ class Player:
 # Method to call upon all players for an action and reset call value:
     @classmethod
     def player_action(cls, round1=True):
-        if len(cls.players_in_hand)>1:
-            if round1==True:
+        if len(cls.players_in_hand) > 1:
+            if round1:
                 for i in cls.players_in_hand:
                     i.action()
                     print(i.player_pot, i.stack)
                 cls.reset_players()
                 for i in cls.players_in_hand:
-                    if i.player_pot < cls.call_value and i.stack !=0:
+                    if i.player_pot < cls.call_value and i.stack != 0:
                         cls.player_action(False)
-            elif round1==False:
+            elif not round1:
                 for i in cls.players_in_hand:
                     if i.player_pot < cls.call_value:
                         i.action()
                         print(i.player_pot, i.stack)
                 cls.reset_players()
                 for i in cls.players_in_hand:
-                    if i.player_pot < cls.call_value and i.stack !=0:
+                    if i.player_pot < cls.call_value and i.stack != 0:
                         cls.player_action(False)
             cls.reset_call()
 
 # Method to provide all necessary information to determine hand and 
-# tie breaker. REQUIRE FIVE CARDS.
+# tiebreaker. REQUIRE FIVE CARDS.
 
     def eval_hand(self, setting=1):
         if setting == 1:
@@ -278,19 +276,25 @@ class Player:
                     or values == [14, 5, 4, 3, 2])
         flush = all(s == suits[0] for s in suits)
 
-        if straight and flush: return 8, "palceholder", values
-        if flush: return 5, "placeholder", values
-        if straight: return 4, "placeholder", values
+        if straight and flush:
+            return 8, "placeholder", values
+        if flush:
+            return 5, "placeholder", values
+        if straight:
+            return 4, "placeholder", values
 
         trips = []
         pairs = []
         for v, group in itertools.groupby(values):
             count = sum(1 for _ in group)
-            if count == 4: return 7, v, values
-            elif count == 3: trips.append(v)
-            elif count == 2: pairs.append(v)
-
-        if trips: return (6 if pairs else 3), trips, values, pairs
+            if count == 4:
+                return 7, v, values
+            elif count == 3:
+                trips.append(v)
+            elif count == 2:
+                pairs.append(v)
+        if trips:
+            return (6 if pairs else 3), trips, values, pairs
         return len(pairs), pairs, values
     
     @classmethod
@@ -298,7 +302,7 @@ class Player:
         winner = [cls.players_in_hand[0]]
         for i in range(1, len(cls.players_in_hand)):
             temp = compare_hands(winner[0], cls.players_in_hand[i])[1]
-            if temp=="Split pot":
+            if temp == "Split pot":
                 winner.append(cls.players_in_hand[i])
             else:
                 winner = [temp]
@@ -361,6 +365,7 @@ class Pot:
 # This function translates the output of the hand evaluator to a statement
 # in English for the player.
 
+
 def hand_interpreter(my_tuple):
     hand = hands_dict[my_tuple[0]]
     my_card = " "
@@ -410,152 +415,156 @@ def hand_interpreter(my_tuple):
 
 # This function compares two hands, either for 1 or 2 players.
 
+
 def compare_hands(player1, player2=None):
     score1 = player1.eval_hand(1)
-    if player2==None:
+    if player2 is None:
         score2 = player1.eval_hand(2)
-        if score1[0]<score2[0]:
-            #print("Score 2 wins")
+        if score1[0] < score2[0]:
+            # print("Score 2 wins")
             return player1.temp_hand, player1
     else:
         score2 = player2.eval_hand(1)
-        if score1[0]<score2[0]:
-            #print("Score 2 wins")
+        if score1[0] < score2[0]:
+            # print("Score 2 wins")
             return player2.hand, player2
     
-    if score1[0]>score2[0]:
-        #print("Score 1 wins")
+    if score1[0] > score2[0]:
+        # print("Score 1 wins")
         return player1.hand, player1
     
-    if score1[0]==score2[0]:
-        #print("Tie")
-        if score1[0]==0 or score1[0]==4 or score1[0]==5 or score1[0]==8:
+    if score1[0] == score2[0]:
+        # print("Tie")
+        if score1[0] == 0 or score1[0] == 4 or score1[0] == 5 or score1[0] == 8:
             i = 0
             ans = "Tie"
             while i <= 4 and ans == "Tie":
                 ans = highcard_tiebreak(score1[2], score2[2], i)
                 if ans == "One":
                     return player1.hand, player1
-                elif ans == "Two" and player2 == None:
+                elif ans == "Two" and player2 is None:
                     return player1.temp_hand, player1
-                elif ans == "Two" and player2 != None:
+                elif ans == "Two" and player2 is not None:
                     return player2.hand, player2
-                i+=1
-            if i==5 and player2 == None:
+                i += 1
+            if i == 5 and player2 is None:
                 return player1.hand, player1
-            elif i==5 and player2!=None:
+            elif i == 5 and player2 is not None:
                 return "placeholder", "Split pot"
-        elif score1[0]==1 or score1[0]==3 or score1[0]==7:
-            if score1[1]>score2[1]:
+        elif score1[0] == 1 or score1[0] == 3 or score1[0] == 7:
+            if score1[1] > score2[1]:
                 return player1.hand, player1
-            elif score1[1]<score2[1] and player2==None:
+            elif score1[1] < score2[1] and player2 is None:
                 return player1.temp_hand, player1
-            elif score1[1]<score2[1] and player2!=None:
+            elif score1[1] < score2[1] and player2 is not None:
                 return player2.hand, player2
-            elif score1[1]==score2[1]:
+            elif score1[1] == score2[1]:
                 i = 0
                 ans = "Tie"
                 while i <= 4 and ans == "Tie":
                     ans = highcard_tiebreak(score1[2], score2[2], i)
                     if ans == "One":
                         return player1.hand, player1
-                    elif ans == "Two" and player2 == None:
+                    elif ans == "Two" and player2 is None:
                         return player1.temp_hand, player1
-                    elif ans == "Two" and player2 != None:
+                    elif ans == "Two" and player2 is not None:
                         return player2.hand, player2
-                    i+=1
-                if i==5 and player2==None:
+                    i += 1
+                if i == 5 and player2 is None:
                     return player1.hand, player2
-                elif i==5 and player2!=None:
+                elif i == 5 and player2 is not None:
                     return "placeholder", "Split pot"
-        elif score1[0]==2:
-            if score1[1][0]>score2[1][0]:
+        elif score1[0] == 2:
+            if score1[1][0] > score2[1][0]:
                 return player1.hand, player1
-            elif score1[1][0]<score2[1][0] and player2==None:
+            elif score1[1][0] < score2[1][0] and player2 is None:
                 return player1.temp_hand, player1
-            elif score1[1][0]<score2[1][0] and player2!=None:
+            elif score1[1][0] < score2[1][0] and player2 is not None:
                 return player2.hand, player2
-            elif score1[1][0]==score2[1][0]:
-                if score1[1][1]>score2[1][1]:
+            elif score1[1][0] == score2[1][0]:
+                if score1[1][1] > score2[1][1]:
                     return player1.hand, player1
-                elif score1[1][1]<score2[1][1] and player2==None:
+                elif score1[1][1] < score2[1][1] and player2 is None:
                     return player1.temp_hand, player1
-                elif score1[1][1]<score2[1][1] and player2!=None:
+                elif score1[1][1] < score2[1][1] and player2 is not None:
                     return player2.hand, player2
-                elif score1[1][1]==score2[1][1]:
+                elif score1[1][1] == score2[1][1]:
                     i = 0
                     ans = "Tie"
                     while i <= 4 and ans == "Tie":
                         ans = highcard_tiebreak(score1[2], score2[2], i)
                         if ans == "One":
                             return player1.hand, player1
-                        elif ans == "Two" and player2 == None:
+                        elif ans == "Two" and player2 is None:
                             return player1.temp_hand, player1
-                        elif ans == "Two" and player2 != None:
+                        elif ans == "Two" and player2 is not None:
                             return player2.hand, player2
-                        i+=1
-                    if i==5 and player2==None:
+                        i += 1
+                    if i == 5 and player2 is None:
                         return player1.hand, player1
-                    elif i==5 and player2!=None:
+                    elif i == 5 and player2 is not None:
                         return "placeholder", "Split pot"
-        elif score1[0]==6:
-            if score1[1][0]>score2[1][0]:
+        elif score1[0] == 6:
+            if score1[1][0] > score2[1][0]:
                 return player1.hand, player1
-            elif score1[1][0]<score2[1][0] and player2==None:
+            elif score1[1][0] < score2[1][0] and player2 is None:
                 return player1.temp_hand, player1
-            elif score1[1][0]<score2[1][0] and player2!=None:
+            elif score1[1][0] < score2[1][0] and player2 is not None:
                 return player2.hand, player2
-            elif score1[1][0]==score2[1][0]:
-                if score1[3][0]>score2[3][0]:
+            elif score1[1][0] == score2[1][0]:
+                if score1[3][0] > score2[3][0]:
                     return player1.hand, player1
-                elif score1[3][0]<score2[3][0] and player2==None:
+                elif score1[3][0] < score2[3][0] and player2 is None:
                     return player1.temp_hand, player1
-                elif score1[3][0]<score2[3][0] and player2!=None:
+                elif score1[3][0] < score2[3][0] and player2 is not None:
                     return player2.hand, player2
-                elif score1[3][0]==score2[3][0]:
+                elif score1[3][0] == score2[3][0]:
                     i = 0
                     ans = "Tie"
                     while i <= 4 and ans == "Tie":
                         ans = highcard_tiebreak(score1[2], score2[2], i)
                         if ans == "One":
                             return player1.hand, player1
-                        elif ans == "Two" and player2 == None:
+                        elif ans == "Two" and player2 is None:
                             return player1.temp_hand, player1
-                        elif ans == "Two" and player2 != None:
+                        elif ans == "Two" and player2 is not None:
                             return player2.hand, player2
-                        i+=1
-                    if i==5 and player2==None:
+                        i += 1
+                    if i == 5 and player2 is None:
                         return player1.hand, player1
-                    elif i==5 and player2!=None:
+                    elif i == 5 and player2 is not None:
                         return "placeholder", "Split pot"
 
                 
 # This function breaks high card ties.
 
-def highcard_tiebreak(vals1, vals2, iter):
-    if vals1[iter]>vals2[iter]:
+
+def highcard_tiebreak(vals1, vals2, it):
+    if vals1[it] > vals2[it]:
         return "One"
-    elif vals1[iter]<vals2[iter]:
+    elif vals1[it] < vals2[it]:
         return "Two"
-    elif vals1[iter]==vals2[iter]:
+    elif vals1[it] == vals2[it]:
         return "Tie"
 
 # This function accepts a player and board to determine the player's
 # best possible hand.
 
+
 def find_best_hand(player, myboard):
     list_of_cards = player.hand + myboard.board
-    combinations = list(itertools.combinations(list_of_cards,5))
+    combinations = list(itertools.combinations(list_of_cards, 5))
     player.hand = list(combinations[0])
-    for i in range(1,21):
+    for i in range(1, 21):
         player.temp_hand = list(combinations[i])
         player.hand = compare_hands(player)[0]
     return hand_interpreter(player.eval_hand())    
 
 # This function rotates a list
 
-def rotate(l, n):
-    return l[n:] + l[:n]
+
+def rotate(mylist, n):
+    return mylist[n:] + mylist[:n]
 
 
 def main():
@@ -565,7 +574,7 @@ def main():
     Player("Lia", 1000)
     Player("Sam", 1000)
     Player("Ben", 1000)
-    Player ("Emma", 1000)
+    Player("Emma", 1000)
     # ======================
 
     # ========================================
@@ -574,7 +583,7 @@ def main():
     number_of_games = 5
     # ========================================
 
-    i=0
+    i = 0
     pot = Pot(Player.players)
 
     while i < number_of_games:
@@ -611,11 +620,11 @@ def main():
         pot.collect_bets()
         print("")
         for j in Player.players_in_hand:
-            print(j.name,", ", find_best_hand(j,board))
+            print(j.name, ", ", find_best_hand(j, board))
             j.show_hand()
             print("")
         winner = Player.find_winner()
-        if len(winner)>1:
+        if len(winner) > 1:
             print("Split pot!")
             winnings = pot.value/len(winner)
             for k in winner:
@@ -627,10 +636,9 @@ def main():
         pot.empty_pot()
         Player.reset_folders()
         Player.discard_hands()
-        i+=1
+        i += 1
         Player.change_order()
         input("\n Next game: ")
-
 
 
 if __name__ == '__main__':
